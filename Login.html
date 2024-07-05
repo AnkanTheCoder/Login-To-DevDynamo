@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        form, .profile {
+            display: none;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+        input {
+            margin: 10px 0;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        p {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <vision url="devdynamo/YOUR_CODE_MOSL">
+    <h2>Account System</h2>
+    <button id="show-signup">Sign Up</button>
+    <button id="show-login">Login</button>
+    <button id="clear-localstorage">Delete All Accounts</button>
+
+    <form id="signup-form">
+        <h3>Sign Up</h3>
+        <input type="text" id="signup-username" placeholder="Username" required>
+        <input type="email" id="signup-email" placeholder="Email" required>
+        <input type="password" id="signup-password" placeholder="Password" required>
+        <button type="submit">Sign Up</button>
+    </form>
+
+    <form id="login-form">
+        <h3>Login</h3>
+        <input type="text" id="login-username" placeholder="Username" required>
+        <input type="password" id="login-password" placeholder="Password" required>
+        <button type="submit">Login And Activate</button>
+        <p id="login-message"></p>
+    </form>
+
+    <div class="profile" id="profile">
+        <h3>Profile</h3>
+        <p>Username: <span id="profile-username"></span></p>
+        <p>Email: <span id="profile-email"></span></p>
+        <button id="logout">Deactivate Account</button>
+    </div>
+
+    <p id="message"></p>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const showSignupButton = document.getElementById('show-signup');
+            const showLoginButton = document.getElementById('show-login');
+            const clearLocalStorageButton = document.getElementById('clear-localstorage');
+            const signupForm = document.getElementById('signup-form');
+            const loginForm = document.getElementById('login-form');
+            const profileDiv = document.getElementById('profile');
+            const profileUsername = document.getElementById('profile-username');
+            const profileEmail = document.getElementById('profile-email');
+            const logoutButton = document.getElementById('logout');
+            const message = document.getElementById('message');
+            const loginMessage = document.getElementById('login-message');
+
+            showSignupButton.addEventListener('click', function () {
+                signupForm.style.display = 'flex';
+                loginForm.style.display = 'none';
+                profileDiv.style.display = 'none';
+                message.textContent = '';
+                loginMessage.textContent = '';
+            });
+
+            showLoginButton.addEventListener('click', function () {
+                loginForm.style.display = 'flex';
+                signupForm.style.display = 'none';
+                profileDiv.style.display = 'none';
+                message.textContent = '';
+                loginMessage.textContent = '';
+            });
+
+            clearLocalStorageButton.addEventListener('click', function () {
+                localStorage.clear();
+                message.textContent = 'All accounts deleted!';
+                profileDiv.style.display = 'none';
+                signupForm.style.display = 'none';
+                loginForm.style.display = 'none';
+            });
+
+            signupForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const username = document.getElementById('signup-username').value;
+                const email = document.getElementById('signup-email').value;
+                const password = document.getElementById('signup-password').value;
+
+                const user = {
+                    username: username,
+                    email: email,
+                    password: password
+                };
+
+                localStorage.setItem('user', JSON.stringify(user));
+                message.textContent = 'Account created successfully!';
+                signupForm.style.display = 'none';
+                showProfile(user);
+            });
+
+            loginForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const username = document.getElementById('login-username').value;
+                const password = document.getElementById('login-password').value;
+
+                const user = JSON.parse(localStorage.getItem('user'));
+
+                if (user && user.username === username && user.password === password) {
+                    loginMessage.textContent = 'Account Activated Successfuly! ';
+                    const viewProfileButton = document.createElement('button');
+                    viewProfileButton.textContent = 'View Profile';
+                    loginMessage.appendChild(viewProfileButton);
+
+                    viewProfileButton.addEventListener('click', function () {
+                        loginForm.style.display = 'none';
+                        showProfile(user);
+                    });
+                } else {
+                    loginMessage.textContent = 'Invalid username or password.';
+                }
+            });
+
+            logoutButton.addEventListener('click', function () {
+                localStorage.removeItem('user');
+                profileDiv.style.display = 'none';
+                message.textContent = 'Account deactivated successfully.';
+            });
+
+            function showProfile(user) {
+                profileUsername.textContent = user.username;
+                profileEmail.textContent = user.email;
+                profileDiv.style.display = 'flex';
+            }
+        });
+    </script>
+</body>
+</html>
